@@ -1,0 +1,1265 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* ==========================================================================
+   BLUEBOX ONE — TerraLabs Industries
+   Connected Road Safety & Enforcement Infrastructure
+
+   TOKEN ARCHITECTURE
+   ------------------
+   Two layers, and components may only touch the second:
+
+     1. RAW PALETTE   literal brand and neutral values. Never used directly.
+     2. SEMANTIC      what a colour *means* here. This is the component API.
+
+   The single most important rule in this file:
+
+     TerraLabs orange is BRAND, not STATUS.
+
+   Orange marks what the operator has selected, what is active, and what is
+   ours. It never means "warning" — status has its own independent scale
+   (green / cyan / amber / red / magenta / grey). Conflating the two would
+   make a selected row look like a hazard, and a hazard look like a selection.
+   ========================================================================== */
+
+:root {
+  /* ======================================================================
+     1. RAW PALETTE
+     ====================================================================== */
+
+  /* -- TerraLabs brand ---------------------------------------------------- */
+  --brand-50: #fff3ef;
+  --brand-100: #ffe1d8;
+  --brand-200: #ffc2b2;
+  --brand-300: #ff9c84;
+  --brand-400: #ff7558;
+  --brand-500: #ff5d3a;
+  --brand-600: #e94c2b;
+  --brand-700: #c93d22;
+
+  /* -- Neutral (graphite) ------------------------------------------------- */
+  --black: #090b0d;
+  --graphite: #111417;
+  --surface-1: #15191d;
+  --surface-2: #1b2025;
+  --surface-3: #23292f;
+  --surface-4: #2b3239;
+  --border-raw: #2c333a;
+  --muted-raw: #7d8790;
+  --text-2-raw: #b6bdc4;
+  --text-1-raw: #f4f5f6;
+
+  /* -- Status scale — independent of brand -------------------------------- */
+  /* Healthy · online · verified */
+  --green: #2fbf71;
+  --green-bright: #5ad894;
+  --green-dim: rgba(47, 191, 113, 0.13);
+
+  /* Informational · processing · system */
+  --cyan: #35a7e8;
+  --cyan-bright: #7cc9f5;
+  --cyan-dim: rgba(53, 167, 232, 0.13);
+
+  /* Attention · degraded · pending */
+  --amber: #f5a524;
+  --amber-bright: #fbc76a;
+  --amber-dim: rgba(245, 165, 36, 0.13);
+
+  /* Critical · violation · failure */
+  --red: #f4364c;
+  --red-bright: #ff7d89;
+  --red-dim: rgba(244, 54, 76, 0.13);
+
+  /* Tamper · security event — deliberately magenta so it never reads as a
+     speed violation, and never as brand orange. */
+  --magenta: #ff4d8d;
+  --magenta-bright: #ff8fb8;
+  --magenta-dim: rgba(255, 77, 141, 0.13);
+
+  /* Offline · unknown · disabled */
+  --grey: #7d8790;
+  --grey-bright: #a4adb6;
+  --grey-dim: rgba(125, 135, 144, 0.13);
+
+  /* ======================================================================
+     2. SEMANTIC — the component API
+     ====================================================================== */
+
+  color-scheme: dark;
+
+  /* -- Grounds ------------------------------------------------------------ */
+  /* Chrome sits *below* content: near-black rails, lifted content panels. */
+  --chrome: var(--black);
+  --chrome-raised: var(--graphite);
+  --chrome-hover: var(--surface-2);
+
+  --bg: var(--black);
+  --panel: var(--surface-1);
+  --panel-header: var(--surface-2);
+  --panel-sunken: var(--graphite);
+  --panel-inset: var(--surface-2);
+  --panel-raised: var(--surface-3);
+
+  /* -- Hairlines ---------------------------------------------------------- */
+  --line: var(--border-raw);
+  --line-soft: #212830;
+  --line-strong: #3a424b;
+
+  /* -- Text ---------------------------------------------------------------
+     --text-3 and --text-4 carry small uppercase captions (t-label is 9.5px),
+     so they are tuned against --panel-raised — the lightest ground they ever
+     land on, inside popovers — rather than merely against --panel. Both clear
+     4.5:1 everywhere while staying a visible step apart from each other. */
+  --text: var(--text-1-raw);
+  --text-2: var(--text-2-raw);
+  --text-3: #9ca5ae;
+  --text-4: #8a939b;
+
+  /* -- Brand -------------------------------------------------------------- */
+  --brand: var(--brand-500);
+  --brand-hover: var(--brand-400);
+  --brand-press: var(--brand-600);
+  --brand-text: var(--brand-300);
+  --brand-dim: rgba(255, 93, 58, 0.13);
+  --brand-dimmer: rgba(255, 93, 58, 0.07);
+  --brand-line: rgba(255, 93, 58, 0.34);
+  --brand-on: #1a0b06;
+  /* Foreground for saturated status fills. White clears only ~3.1:1 on the
+     tamper magenta and ~3.8:1 on the critical red, which fails for 9.5px chip
+     text; this near-black clears AA on both while keeping the fill saturated. */
+  --on-solid: #120306;
+
+  /* -- Status (semantic aliases) ------------------------------------------ */
+  --ok: var(--green);
+  --ok-text: var(--green-bright);
+  --ok-dim: var(--green-dim);
+  --ok-line: rgba(47, 191, 113, 0.3);
+
+  --info: var(--cyan);
+  --info-text: var(--cyan-bright);
+  --info-dim: var(--cyan-dim);
+  --info-line: rgba(53, 167, 232, 0.3);
+
+  --warn: var(--amber);
+  --warn-text: var(--amber-bright);
+  --warn-dim: var(--amber-dim);
+  --warn-line: rgba(245, 165, 36, 0.3);
+
+  --crit: var(--red);
+  --crit-text: var(--red-bright);
+  --crit-dim: var(--red-dim);
+  --crit-line: rgba(244, 54, 76, 0.32);
+
+  --tamper: var(--magenta);
+  --tamper-text: var(--magenta-bright);
+  --tamper-dim: var(--magenta-dim);
+  --tamper-line: rgba(255, 77, 141, 0.32);
+
+  --idle: var(--grey);
+  --idle-text: var(--grey-bright);
+  --idle-dim: var(--grey-dim);
+  --idle-line: rgba(125, 135, 144, 0.28);
+
+  /* -- Radii — industrial, not consumer ----------------------------------- */
+  --r-xs: 3px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-pill: 999px;
+
+  /* -- Elevation — only for surfaces that genuinely float ------------------ */
+  --shadow-pop: 0 8px 20px -6px rgba(0, 0, 0, 0.7), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-float: 0 28px 60px -16px rgba(0, 0, 0, 0.85), 0 8px 20px -8px rgba(0, 0, 0, 0.6);
+
+  /* -- Motion ------------------------------------------------------------- */
+  --t-fast: 110ms;
+  --t-base: 160ms;
+  --t-slow: 240ms;
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* -- Layout ------------------------------------------------------------- */
+  --sidebar-w: 218px;
+  --sidebar-w-collapsed: 52px;
+  --topbar-h: 46px;
+
+  /* -- Z-index ------------------------------------------------------------ */
+  --z-content: 1;
+  --z-sticky: 20;
+  /* Leaflet gives its own controls z-index 800-1000 inside the map container,
+     so anything floating over the plot has to clear that. Safe because the map
+     root isolates its stacking context — see OperationsMap. */
+  --z-map-control: 1200;
+  --z-sidebar: 40;
+  --z-topbar: 50;
+  --z-scrim: 60;
+  --z-overlay: 70;
+  --z-toast: 80;
+  --z-boot: 90;
+}
+
+/* ==========================================================================
+   LIGHT MODE
+   Scoped to reporting and configuration surfaces, and available globally via
+   `data-theme="light"`. Only the semantic layer is re-pointed — no component
+   knows this exists, which is the entire reason for the two-layer split.
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --chrome: #101316;
+  --chrome-raised: #1a1e22;
+  --chrome-hover: #242a30;
+
+  --bg: #f5f5f2;
+  --panel: #ffffff;
+  --panel-header: #fafaf8;
+  --panel-sunken: #f2f2ef;
+  --panel-inset: #eeeeea;
+  --panel-raised: #ffffff;
+
+  --line: #dfdfd8;
+  --line-soft: #ebebe5;
+  --line-strong: #c5c5bc;
+
+  --text: #111214;
+  --text-2: #45484c;
+  --text-3: #6b7076;
+  --text-4: #91969c;
+
+  --brand-text: var(--brand-700);
+  --brand-dim: rgba(255, 93, 58, 0.1);
+  --brand-dimmer: rgba(255, 93, 58, 0.05);
+  --brand-line: rgba(255, 93, 58, 0.4);
+
+  --ok: #0f8a4f;
+  --ok-text: #0a6b3d;
+  --ok-dim: rgba(15, 138, 79, 0.1);
+  --ok-line: rgba(15, 138, 79, 0.3);
+
+  --info: #1c7fbd;
+  --info-text: #14608f;
+  --info-dim: rgba(28, 127, 189, 0.1);
+  --info-line: rgba(28, 127, 189, 0.3);
+
+  --warn: #b4700a;
+  --warn-text: #8c5607;
+  --warn-dim: rgba(180, 112, 10, 0.1);
+  --warn-line: rgba(180, 112, 10, 0.3);
+
+  --crit: #cf1d33;
+  --crit-text: #a41527;
+  --crit-dim: rgba(207, 29, 51, 0.1);
+  --crit-line: rgba(207, 29, 51, 0.3);
+
+  --tamper: #cc2069;
+  --tamper-text: #a41854;
+  --tamper-dim: rgba(204, 32, 105, 0.1);
+  --tamper-line: rgba(204, 32, 105, 0.3);
+
+  --idle: #6b7076;
+  --idle-text: #55595e;
+  --idle-dim: rgba(107, 112, 118, 0.1);
+  --idle-line: rgba(107, 112, 118, 0.28);
+
+  --shadow-pop: 0 6px 16px -4px rgba(17, 18, 20, 0.14), 0 2px 4px -2px rgba(17, 18, 20, 0.08);
+  --shadow-float: 0 24px 48px -12px rgba(17, 18, 20, 0.22), 0 8px 16px -8px rgba(17, 18, 20, 0.12);
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-ok: var(--ok);
+  --color-info: var(--info);
+  --color-warn: var(--warn);
+  --color-crit: var(--crit);
+  --color-tamper: var(--tamper);
+  --color-idle: var(--idle);
+
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-ink-3: var(--text-3);
+  --color-ink-4: var(--text-4);
+
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-line-strong: var(--line-strong);
+
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-data);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background-color: var(--bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100svh;
+    margin: 0;
+    color: var(--text);
+    background-color: var(--bg);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02" on, "cv03" on, "cv04" on;
+  }
+
+  ::selection {
+    background: rgba(255, 93, 58, 0.3);
+    color: var(--text);
+  }
+
+  /* Focus is a brand moment: it marks where the operator is. */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 1px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure {
+    margin: 0;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-4) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--surface-4);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #3d454e;
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  /* ==========================================================================
+     TYPOGRAPHY
+     One ladder, sized for operational density. The largest running type is a
+     19px page title — nothing here is marketing scale.
+     ========================================================================== */
+
+  .t-page-label {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-4);
+  }
+
+  .t-page-title {
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.017em;
+    color: var(--text);
+  }
+
+  .t-page-desc {
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--text-3);
+  }
+
+  .t-section {
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .t-panel-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.004em;
+    color: var(--text);
+  }
+
+  .t-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-4);
+  }
+
+  .t-body {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  .t-meta {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-3);
+  }
+
+  /* -- Telemetry ----------------------------------------------------------
+     Mono is a signal, not a texture: it marks a value that came off a device
+     — a measurement, an identifier, a hash, an instant. Prose stays sans. */
+
+  .t-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" on;
+  }
+
+  .t-metric {
+    font-family: var(--font-data);
+    font-size: 23px;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.028em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .t-metric-lg {
+    font-family: var(--font-data);
+    font-size: 38px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.034em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .t-metric-xl {
+    font-family: var(--font-data);
+    font-size: 60px;
+    font-weight: 500;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .t-mono {
+    font-family: var(--font-data);
+    font-size: 11.5px;
+    letter-spacing: -0.006em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .t-mono-sm {
+    font-family: var(--font-data);
+    font-size: 10.5px;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Registration identity — jurisdiction-agnostic, so it must hold any
+     plate format from `KL 07 AB 1289` to `1-ABC-234`. */
+  .t-reg {
+    font-family: var(--font-data);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    color: var(--text);
+  }
+
+  /* ==========================================================================
+     SURFACES
+     Border-defined, never shadow-defined. Elevation is reserved for things
+     that actually float.
+     ========================================================================== */
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+  }
+
+  .panel-flush {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  .well {
+    background: var(--panel-sunken);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-sm);
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 36px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel-header);
+  }
+
+  /* A panel takes a status edge only when the whole panel is in that state. */
+  .panel-crit {
+    border-color: var(--crit-line);
+    box-shadow: inset 2px 0 0 var(--crit);
+  }
+  .panel-warn {
+    border-color: var(--warn-line);
+    box-shadow: inset 2px 0 0 var(--warn);
+  }
+  .panel-ok {
+    border-color: var(--ok-line);
+    box-shadow: inset 2px 0 0 var(--ok);
+  }
+  .panel-tamper {
+    border-color: var(--tamper-line);
+    box-shadow: inset 2px 0 0 var(--tamper);
+  }
+  /* Brand edge = selected/active, never a hazard. */
+  .panel-active {
+    border-color: var(--brand-line);
+    box-shadow: inset 2px 0 0 var(--brand);
+  }
+
+  /* ==========================================================================
+     STATUS LANGUAGE
+     `data-status` is the switch. Six tones, fixed meanings, used identically
+     on every route.
+     ========================================================================== */
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    padding: 1px 6px;
+    border: 1px solid transparent;
+    border-radius: var(--r-xs);
+    font-size: 9.5px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chip[data-status="ok"] {
+    background: var(--ok-dim);
+    border-color: var(--ok-line);
+    color: var(--ok-text);
+  }
+  .chip[data-status="info"] {
+    background: var(--info-dim);
+    border-color: var(--info-line);
+    color: var(--info-text);
+  }
+  .chip[data-status="warn"] {
+    background: var(--warn-dim);
+    border-color: var(--warn-line);
+    color: var(--warn-text);
+  }
+  .chip[data-status="crit"] {
+    background: var(--crit-dim);
+    border-color: var(--crit-line);
+    color: var(--crit-text);
+  }
+  .chip[data-status="tamper"] {
+    background: var(--tamper-dim);
+    border-color: var(--tamper-line);
+    color: var(--tamper-text);
+  }
+  .chip[data-status="idle"] {
+    background: var(--idle-dim);
+    border-color: var(--idle-line);
+    color: var(--idle-text);
+  }
+  .chip[data-status="brand"] {
+    background: var(--brand-dim);
+    border-color: var(--brand-line);
+    color: var(--brand-text);
+  }
+
+  /* Solid — for the few states that must outrank everything beside them. */
+  .chip[data-solid="true"][data-status="crit"] {
+    background: var(--crit);
+    border-color: var(--crit);
+    color: var(--on-solid);
+  }
+  .chip[data-solid="true"][data-status="tamper"] {
+    background: var(--tamper);
+    border-color: var(--tamper);
+    color: var(--on-solid);
+  }
+  .chip[data-solid="true"][data-status="warn"] {
+    background: var(--warn);
+    border-color: var(--warn);
+    color: #17130a;
+  }
+  .chip[data-solid="true"][data-status="ok"] {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #04140b;
+  }
+  .chip[data-solid="true"][data-status="brand"] {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: var(--brand-on);
+  }
+
+  .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    flex: none;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .dot[data-status="ok"] {
+    background: var(--ok);
+  }
+  .dot[data-status="info"] {
+    background: var(--info);
+  }
+  .dot[data-status="warn"] {
+    background: var(--warn);
+  }
+  .dot[data-status="crit"] {
+    background: var(--crit);
+  }
+  .dot[data-status="tamper"] {
+    background: var(--tamper);
+  }
+  .dot[data-status="idle"] {
+    background: var(--idle);
+  }
+  .dot[data-status="brand"] {
+    background: var(--brand);
+  }
+
+  /* A live signal — reserved for state that is genuinely updating. */
+  .dot-live {
+    position: relative;
+  }
+
+  .dot-live::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    color: inherit;
+    background: inherit;
+    opacity: 0;
+    animation: bb-ping 2.2s var(--ease-out) infinite;
+  }
+
+  .dot-live[data-status="ok"]::after {
+    border-color: var(--ok);
+  }
+  .dot-live[data-status="crit"]::after {
+    border-color: var(--crit);
+  }
+  .dot-live[data-status="tamper"]::after {
+    border-color: var(--tamper);
+  }
+  .dot-live[data-status="brand"]::after {
+    border-color: var(--brand);
+  }
+
+  @keyframes bb-ping {
+    0% {
+      transform: scale(0.65);
+      opacity: 0.8;
+    }
+    70%,
+    100% {
+      transform: scale(1.7);
+      opacity: 0;
+    }
+  }
+
+  /* ==========================================================================
+     DATA TABLES
+     The most important surface in the product.
+     ========================================================================== */
+
+  .grid-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12.5px;
+  }
+
+  .grid-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 6px 12px;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-4);
+    background: var(--panel-header);
+    border-bottom: 1px solid var(--line);
+    user-select: none;
+  }
+
+  .grid-table thead th[data-sortable="true"] {
+    cursor: pointer;
+  }
+
+  .grid-table thead th[data-sortable="true"]:hover {
+    color: var(--text-2);
+    background: var(--panel-raised);
+  }
+
+  .grid-table tbody td {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--text-2);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .grid-table[data-density="relaxed"] tbody td {
+    padding: 9px 12px;
+  }
+
+  .grid-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .grid-table tbody tr[data-interactive="true"] {
+    cursor: pointer;
+  }
+
+  .grid-table tbody tr[data-interactive="true"]:hover td {
+    background: var(--panel-header);
+  }
+
+  /* Selection is brand. Severity is status. They never use the same colour,
+     so a selected critical row still reads as both. */
+  .grid-table tbody tr[data-selected="true"] td {
+    background: var(--brand-dimmer);
+  }
+
+  .grid-table tbody tr[data-selected="true"] td:first-child {
+    box-shadow: inset 2px 0 0 var(--brand);
+  }
+
+  .grid-table tbody tr[data-severity="crit"] td:first-child {
+    box-shadow: inset 2px 0 0 var(--crit);
+  }
+  .grid-table tbody tr[data-severity="tamper"] td:first-child {
+    box-shadow: inset 2px 0 0 var(--tamper);
+  }
+  .grid-table tbody tr[data-severity="warn"] td:first-child {
+    box-shadow: inset 2px 0 0 var(--warn);
+  }
+
+  .grid-table tbody tr:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+  }
+
+  .scroll-x {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  /* ==========================================================================
+     CONTROLS
+     ========================================================================== */
+
+  .field {
+    width: 100%;
+    height: 28px;
+    padding: 0 9px;
+    color: var(--text);
+    background: var(--panel-sunken);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font: inherit;
+    font-size: 12.5px;
+    outline: none;
+    transition:
+      border-color var(--t-fast) var(--ease),
+      box-shadow var(--t-fast) var(--ease),
+      background-color var(--t-fast) var(--ease);
+  }
+
+  .field::placeholder {
+    color: var(--text-4);
+  }
+
+  .field:hover:not(:disabled) {
+    border-color: var(--line-strong);
+  }
+
+  .field:focus,
+  .field:focus-visible {
+    outline: none;
+    border-color: var(--brand);
+    background: var(--panel);
+    box-shadow: 0 0 0 3px var(--brand-dimmer);
+  }
+
+  .field:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: var(--crit);
+  }
+
+  textarea.field {
+    height: auto;
+    min-height: 68px;
+    padding: 6px 9px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  select.field {
+    appearance: none;
+    padding-right: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%237d8790' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    cursor: pointer;
+  }
+
+  select.field option {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  /* Segmented control — the standard filter affordance product-wide. */
+  .segment {
+    display: inline-flex;
+    padding: 2px;
+    background: var(--panel-sunken);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .segment > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 21px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: var(--r-xs);
+    background: transparent;
+    color: var(--text-3);
+    font: inherit;
+    font-size: 11.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--t-fast) var(--ease),
+      color var(--t-fast) var(--ease);
+  }
+
+  .segment > button:hover {
+    color: var(--text);
+  }
+
+  .segment > button[aria-pressed="true"] {
+    background: var(--surface-3);
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 18px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--brand) 0%,
+      var(--brand) var(--range-progress, 0%),
+      var(--surface-3) var(--range-progress, 0%),
+      var(--surface-3) 100%
+    );
+  }
+
+  .range::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--surface-3);
+  }
+
+  .range::-moz-range-progress {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--brand);
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    margin-top: -4.5px;
+    border-radius: 999px;
+    background: var(--text-1-raw);
+    border: 3px solid var(--brand);
+  }
+
+  .range::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border-radius: 999px;
+    background: var(--text-1-raw);
+    border: 3px solid var(--brand);
+  }
+
+  .range:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--brand-dim);
+  }
+
+  /* ==========================================================================
+     MOTION
+     Short, purposeful, never decorative.
+     ========================================================================== */
+
+  @keyframes bb-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes bb-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 4px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes bb-slide-in {
+    from {
+      transform: translate3d(18px, 0, 0);
+      opacity: 0;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  @keyframes bb-indeterminate {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(320%);
+    }
+  }
+
+  /* Qualification urgency. The ring is the only element in the product allowed
+     to pulse continuously, because it marks a rule actively counting down. */
+  @keyframes bb-urgent {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+
+  .a-fade {
+    animation: bb-fade var(--t-base) var(--ease) both;
+  }
+
+  .a-rise {
+    animation: bb-rise var(--t-slow) var(--ease-out) both;
+  }
+
+  .a-slide-in {
+    animation: bb-slide-in var(--t-slow) var(--ease-out) both;
+  }
+
+  .a-urgent {
+    animation: bb-urgent 1.1s var(--ease) infinite;
+  }
+
+  .progress-indeterminate {
+    position: relative;
+    overflow: hidden;
+    height: 2px;
+    background: var(--surface-3);
+    border-radius: 999px;
+  }
+
+  .progress-indeterminate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 30%;
+    background: var(--brand);
+    border-radius: 999px;
+    animation: bb-indeterminate 1.4s var(--ease) infinite;
+  }
+
+  /* ==========================================================================
+     UTILITY
+     ========================================================================== */
+
+  .hair {
+    height: 1px;
+    border: 0;
+    background: var(--line);
+  }
+
+  /* Marks a region as simulated. Used wherever demo data could otherwise be
+     mistaken for a live deployment reading. */
+  .hatch-demo {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(245, 165, 36, 0.06) 0,
+      rgba(245, 165, 36, 0.06) 4px,
+      transparent 4px,
+      transparent 9px
+    );
+  }
+}
+
+/* ==========================================================================
+   THIRD-PARTY SURFACES
+   ========================================================================== */
+
+/* --- Leaflet ----------------------------------------------------------- */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--graphite);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+/* Invert OSM into a graphite basemap so operational markers are the only
+   saturated thing on the map. The map is a substrate, not a picture. */
+.leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.78) contrast(0.86) saturate(0.16);
+}
+
+[data-theme="light"] .leaflet-tile-pane {
+  filter: grayscale(0.85) contrast(0.95) brightness(1.04);
+}
+
+/* The layer filter bar occupies the top-left corner, so Leaflet's own zoom
+   control is pushed clear of it rather than being overlapped. */
+.leaflet-top.leaflet-left {
+  margin-top: 38px;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-sm) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-pop) !important;
+}
+
+.leaflet-control-zoom a {
+  width: 26px !important;
+  height: 26px !important;
+  line-height: 26px !important;
+  background: var(--surface-2) !important;
+  color: var(--text-2) !important;
+  border-color: var(--line) !important;
+  font-size: 15px !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--surface-3) !important;
+  color: var(--text) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(9, 11, 13, 0.78) !important;
+  color: var(--text-4) !important;
+  font-size: 9.5px !important;
+  padding: 1px 6px !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--text-3) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: var(--shadow-float) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+  min-width: 180px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.leaflet-popup-tip {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--text-4) !important;
+  padding: 5px 6px 0 0 !important;
+}
+
+/* Offline substrate — a survey grid, so an unreachable tile server still
+   reads as a deliberate spatial surface rather than a broken screen. */
+.map-offline {
+  background-color: var(--graphite);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+}
+
+/* --- Recharts ---------------------------------------------------------- */
+.recharts-surface:focus,
+.recharts-wrapper:focus {
+  outline: none;
+}
+
+.recharts-cartesian-axis-tick text {
+  font-family: var(--font-data);
+  font-size: 10px;
+  fill: var(--text-4);
+}
+
+/* --- Sonner ------------------------------------------------------------ */
+[data-sonner-toaster] {
+  --normal-bg: var(--surface-2);
+  --normal-border: var(--line);
+  --normal-text: var(--text);
+  z-index: var(--z-toast);
+}
+
+[data-sonner-toast] {
+  border-radius: var(--r-md) !important;
+  box-shadow: var(--shadow-float) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+[data-sonner-toast] [data-description] {
+  color: var(--text-3) !important;
+  font-size: 11.5px;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+
+.skip-link {
+  position: fixed;
+  left: 8px;
+  top: 8px;
+  z-index: 200;
+  padding: 8px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--brand);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-pop);
+  font-size: 12.5px;
+  font-weight: 600;
+  transform: translateY(-250%);
+  transition: transform var(--t-base) var(--ease);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .dot-live::after,
+  .progress-indeterminate::after,
+  .a-urgent {
+    animation: none;
+  }
+
+  .progress-indeterminate::after {
+    width: 100%;
+  }
+}

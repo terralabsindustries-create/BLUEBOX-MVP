@@ -1,0 +1,39 @@
+# ---- Dependencies ----
+node_modules/
+.pnp
+.pnp.*
+
+# ---- Build output ----
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# ---- Portable Windows Node runtime (87MB, not tracked in git) ----
+# Download the Windows x64 Node binary and place it at runtime/node.exe
+# for the portable client bundle to run. See README-CLIENT.txt.
+runtime/node.exe
+
+# ---- Runtime logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- Environment / secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Editor / OS ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---- Deploy ----
+.vercel

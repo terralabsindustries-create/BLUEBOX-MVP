@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 847 713" role="img" aria-labelledby="title desc">
+  <title id="title">TerraLabs Industries</title>
+  <desc id="desc">TerraLabs Industries orange road-inspired logo and wordmark</desc>
+  <path fill="#ff5839" d="M10 506V318C10 169 130 51 281 51h316c126 0 220 99 220 228 0 127-94 229-220 229H23c-7 0-13-6-13-13Z"/>
+  <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M71 216C110 132 190 89 280 89h315c105 0 190 84 190 189 0 104-84 189-190 189H383" stroke-width="25"/>
+    <path d="M111 249c31-64 95-105 166-105h304c83 0 150 66 150 148 0 81-67 148-150 148H501" stroke-width="25"/>
+    <path d="M172 287c24-44 70-72 120-72h69M488 215h99c42 0 75 34 75 75s-33 75-75 75H323v117" stroke-width="25"/>
+    <path d="M602 281H282c-24 0-44 20-44 44v55" stroke-width="25"/>
+    <path d="M383 482v-60" stroke-width="25"/>
+  </g>
+  <text x="731" y="96" fill="#050505" font-family="Arial, sans-serif" font-size="56" font-weight="500">TM</text>
+  <path d="M10 594h254" stroke="#ff5839" stroke-width="9"/>
+  <text x="393" y="584" fill="#050505" font-family="Arial Narrow, Arial, sans-serif" font-size="62" font-weight="400" letter-spacing="7">TERRALABS</text>
+  <text x="345" y="654" fill="#050505" font-family="Arial Black, Arial, sans-serif" font-size="64" font-weight="900" letter-spacing="3">INDUSTRIES</text>
+</svg>
